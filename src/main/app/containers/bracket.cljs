@@ -12,6 +12,7 @@
       :class (when (true? (:selected team))
                    "text-grey")}
      (:name team)]))
+     ; (dispatch [::events/get-matchup])]))
 
 (defn- matchup [{:keys [teams round-index group-index]
                  :as matchup-info}]
