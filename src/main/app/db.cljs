@@ -1,8 +1,5 @@
 (ns app.db)
 
-; (def team
-;   {:name "Virginia" :seed 1 :id "abc123"})
-
 (def bracket
   [[[{:name "Team A" :seed 1 :id "idA"}
      {:name "Team B" :seed 2 :id "idB"}]

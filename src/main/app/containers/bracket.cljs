@@ -7,7 +7,7 @@
 
 (defn- team-item [team matchup-info]
   (fn []
-    [:li.bg-grey-light.m-2.p-4.cursor-pointer.rounded-sm
+    [:li.bg-grey-light.m-1.px-3.py-2.cursor-pointer.rounded-sm.text-sm
      {:on-click #(dispatch [::events/select-team matchup-info])
       :class (when (true? (:selected team))
                    "text-grey")}
@@ -16,7 +16,7 @@
 (defn- matchup [{:keys [teams round-index group-index]
                  :as matchup-info}]
   (fn []
-    [:ul.list-reset.p-4
+    [:ul.list-reset
      (map-indexed
        (fn [team-index team]
          ^{:key team-index}
@@ -27,7 +27,7 @@
 (defn round [round-index]
   (let [round-teams (subscribe [::subs/bracket round-index])]
     (fn []
-      [:ul.list-reset
+      [:ul.list-reset.flex.flex-col.flex-grow.justify-between
        (map-indexed
          (fn [group-index teams]
            ^{:key (str group-index round-index teams)}
@@ -37,6 +37,6 @@
          @round-teams)])))
 
 (defn render []
-  [:div.flex
+  [:div.flex.h-screen.p-8
    [round 0]
    [round 1]])

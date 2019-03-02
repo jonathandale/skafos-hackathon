@@ -53,5 +53,7 @@
       (-> db
         (update-in [:bracket round-index group-index team-index]
           (fn [team]
-            (assoc team :selected true)))))))
-        ; (update-in [:bracket round-index group-index team-index]))))
+            (assoc team :selected true)))
+        (update-in [:bracket (inc round-index) next-group]
+          (fn [new-group]
+            (conj new-group team)))))))
