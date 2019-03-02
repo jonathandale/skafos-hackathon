@@ -26,7 +26,6 @@
 
 (defn- team-item [team matchup-info]
   (fn []
-    (log team)
     [:li
      {:on-click #(dispatch [::events/select-team matchup-info])
       :class (if (true? (:selected team))
@@ -34,10 +33,8 @@
                active-team-classes)}
      (:name team)]))
 
-(defn- empty-matchup []
-  [:<>
-   [:li {:class pending-team-classes} "."]
-   [:li {:class pending-team-classes} "."]])
+(defn- empty-team []
+  [:li {:class pending-team-classes} "."])
 
 (defn- matchup
   [{:keys [teams round-index group-index group-height]
@@ -46,14 +43,12 @@
     [:div.flex.flex-col.justify-center
      {:style {:height (str group-height "%")}}
      [:ul.list-reset
-      (if (= :empty teams)
-        [empty-matchup]
-        (map-indexed
-          (fn [team-index team]
-            ^{:key team-index}
-             [team-item team (assoc matchup-info
-                                    :team-index team-index)])
-          teams))]]))
+      (if-let [t1 (first teams)]
+        [team-item t1 (assoc matchup-info :team-index 0)]
+        [empty-team])
+      (if-let [t2 (second teams)]
+        [team-item t2 (assoc matchup-info :team-index 1)]
+        [empty-team])]]))
 
 (defn round [round-index]
   (let [round-teams (subscribe [::subs/bracket round-index])]
@@ -63,9 +58,8 @@
          {:class "w-1/4"}
          (map-indexed
            (fn [group-index teams]
-             (log "teams" teams)
              ^{:key (str group-index round-index teams)}
-              [matchup {:teams (if (empty? teams) :empty teams)
+              [matchup {:teams teams
                         :round-index round-index
                         :group-index group-index
                         :group-height group-height}])
