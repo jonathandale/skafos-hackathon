@@ -1,0 +1,8 @@
+node_modules/
+target/
+public/js/compiled/
+public/index.html
+public/app.min.css
+out/
+.shadow-cljs
+.nrepl*
