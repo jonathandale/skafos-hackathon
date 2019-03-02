@@ -37,8 +37,10 @@
 
 ;; Bracket events
 
-(defn- calc-next-position [team-index group-index next-round]
-  (.floor js/Math (/ (* 2 group-index) (count next-round))))
+(defn- calc-next-position [round-index team-index group-index next-round]
+  (prn (str "team index: " team-index " group index: " group-index " next round: " (count next-round) "current round: " current-round))
+  (prn (str "math before floor " (/ (* 2 group-index) (count next-round))))
+  (.floor js/Math (/ (* (- 2 round-index) group-index) (count next-round))))
 
 (re-frame/reg-event-db
   ::select-team
@@ -47,7 +49,7 @@
                             team-index
                             teams]}]]
     (let [next-round (get-in db [:bracket (inc round-index)])
-          next-group (calc-next-position team-index group-index next-round)
+          next-group (calc-next-position round-index team-index group-index next-round)
           team (nth teams team-index)]
       (log "Update " team " into" next-group)
       (-> db

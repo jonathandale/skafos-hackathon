@@ -39,4 +39,6 @@
 (defn render []
   [:div.flex.h-screen.p-8
    [round 0]
-   [round 1]])
+   [round 1]
+   [round 2]
+   [round 3]])
