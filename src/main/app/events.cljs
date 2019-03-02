@@ -34,11 +34,44 @@
   (fn [db [_ dimensions]]
     (assoc db :window-dimensions dimensions)))
 
+;; Round Probabilities
+(re-frame/reg-event-fx
+  ::get-matchup
+  (fn-traced [{:keys [db]} [_]]
+   {:db (-> db
+          (dissoc :matchup :get-matchup-error)
+          (assoc :fetching? true))
+    :http-xhrio (merge base-request
+                  {:headers         {"X-API-TOKEN" "a3c6df8ff9e507ccfbae15966d883747"}
+                   :method          :get
+                   :uri             (str config/api-url
+                                         "/data/cb571a77b504cc24ebc883d0/matchup")
+                   :on-success      [:get-matchup-success]
+                   :on-failure      [:get-matchup-error]})}))
+
+(re-frame/reg-event-fx
+ ::get-matchup-success
+ [->kebab-case]
+ (fn-traced [{:keys [db]} [_ results]]
+   (prn "matchup resutls" results)
+   {:db (-> db
+         (assoc :matchups results)
+         (dissoc :fetching?))}))
+
+
+(re-frame/reg-event-fx
+ ::get-matchup-error
+  (fn [db [_ error]]
+   (-> db
+     (assoc :matchup-error error)
+     (dissoc :fetching?))))
+
+
 
 ;; Bracket events
 
 (defn- calc-next-position [round-index team-index group-index next-round]
-  (prn (str "team index: " team-index " group index: " group-index " next round: " (count next-round) "current round: " current-round))
+  (prn (str "team index: " team-index " group index: " group-index " next round: " (count next-round) "current round: " round-index))
   (prn (str "math before floor " (/ (* 2 group-index) (count next-round))))
   (.floor js/Math (/ (* (- 2 round-index) group-index) (count next-round))))
 
