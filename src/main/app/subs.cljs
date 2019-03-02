@@ -7,6 +7,10 @@
     (:page db)))
 
 (reg-sub
+  ::matchup
+  (fn [db [_ matchup]]))
+
+(reg-sub
   ::bracket
   (fn [db [_ round]]
     (nth (:bracket db) round)))
