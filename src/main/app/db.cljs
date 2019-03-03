@@ -51,4 +51,7 @@
    [[]]])
 
 (def default-db
-  {:bracket {:east (bracket east)}})
+  {:bracket {:east (bracket east)
+             :west (bracket west)
+             :midwest (bracket midwest)
+             :south (bracket south)}})

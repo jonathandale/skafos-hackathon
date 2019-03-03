@@ -5,5 +5,3 @@
 
 (def api-url API_URL)
 (def x-api-token X_API_TOKEN)
-
-(prn "x-api-token: " x-api-token)

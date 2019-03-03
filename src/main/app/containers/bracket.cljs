@@ -6,7 +6,7 @@
             [app.utils :refer [log]]))
 
 (def base-team-classes
-  ["rounded-sm" "text-sm" "px-2" "py-1" "m-2"])
+  ["rounded-sm" "text-sm" "px-2" "py-1" "m-1"])
 
 (def active-team-classes
   (concat
@@ -36,9 +36,9 @@
        [:div.relative.z-10
         [:p.text-xs (:name team)]
         [:p.text-xs.opacity-75 "#" (:ranking team)]]
-       [:div.absolute.pin-y.pin-l.bg-white
+       [:div.absolute.pin-y.pin-l.bg-pink-dark
         {:style {:width "29%"
-                 :opacity "0.4"}}]])))
+                 :opacity "0.8"}}]])))
 
 (defn- empty-team []
   [:li {:class pending-team-classes}
@@ -51,7 +51,7 @@
   (fn []
     [:div.flex.flex-col.justify-center
      {:style {:height (str group-height "%")}}
-     [:ul.list-reset
+     [:ul.list-reset.my-3
       (if-let [t1 (first teams)]
         [team-item t1 (assoc matchup-info :team-index 0)]
         [empty-team])
@@ -63,8 +63,7 @@
   (let [round-teams (subscribe [::subs/bracket region round-index])]
     (fn []
       (let [group-height (/ 100 (count @round-teams))]
-        [:ul.list-reset
-         {:class "w-1/5"}
+        [:ul.list-reset.w-1:4
          (map-indexed
            (fn [group-index teams]
              ^{:key (str group-index round-index teams)}
@@ -76,10 +75,28 @@
            @round-teams)]))))
 
 (defn render []
-  [:div.flex
-   [:div.flex.h-screen.relative.px-6
-    {:class "w-1/2"}
-    [round :east 0]
-    [round :east 1]
-    [round :east 2]
-    [round :east 3]]])
+  [:div
+   [:div.flex
+    [:div.flex.w-4:9
+     [round :east 0]
+     [round :east 1]
+     [round :east 2]
+     [round :east 3]]
+    [:div.flex.w-1:9]
+    [:div.flex.w-4:9
+     [round :west 3]
+     [round :west 2]
+     [round :west 1]
+     [round :west 0]]]
+   [:div.flex
+    [:div.flex.w-4:9
+     [round :midwest 0]
+     [round :midwest 1]
+     [round :midwest 2]
+     [round :midwest 3]]
+    [:div.flex.w-1:9]
+    [:div.flex.w-4:9
+     [round :south 3]
+     [round :south 2]
+     [round :south 1]
+     [round :south 0]]]])
