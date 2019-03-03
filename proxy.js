@@ -8,9 +8,9 @@ const onProxyRes = function(proxyRes, req, res){
   proxyRes.headers['Access-Control-Allow-Origin'] = 'http://localhost:8280';
 };
 
-const apiUrl = 'https://api.metif.wtf';
+const apiUrl = 'https://api.metismachine.io';
 
-api_app.use('/', proxy({target: apiUrl, changeOrigin: true, onProxyRes: onProxyRes}));
+api_app.use('/v1/data/cb571a77b504cc24ebc883d0/matchup', proxy({target: apiUrl, changeOrigin: true, onProxyRes: onProxyRes}));
 api_app.listen(4000);
 
-console.log(`\nRunning ${chalk.blue('api')} proxy for ${chalk.yellow.underline(mode.toUpperCase())} on port 4000`);
+console.log(`\nRunning ${chalk.blue('api')} proxy on port 4000`);
