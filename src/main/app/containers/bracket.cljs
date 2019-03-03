@@ -24,9 +24,10 @@
   (into base-team-classes
     ["bg-grey-lighter" "text-grey-lighter" "rounded-b-none" "border-b" "border-white"]))
 
-(defn- team-item [team matchup-info]
+(defn- team-item [team matchup-info probs]
   (fn []
     (let [disabled? (some :selected (:teams matchup-info))]
+      (log "win prob" @probs)
       [:li.relative
        {:on-click #(when-not disabled?
                      (dispatch [::events/select-team team matchup-info]))
@@ -46,11 +47,12 @@
                  [(str "bg-" (name (:color matchup-info)) "-darker")])}
        [:div.relative.z-10
         [:p [:span.text-xs.opacity-75 (:ranking team)]
-            [:span.text-xs " " (:name team)]]]
+            [:span.text-xs " " (:name team)]
+            [:span.text-xs " " probs]]]
        (when-not disabled?
          [:div.absolute.pin-y.pin-l.rounded-sm.rounded-r-none
           {:class [(str "bg-" (name (:color matchup-info)) "-darkest")]
-           :style {:width "29%"
+           :style {:width (str (* 10 probs) "%")
                    :opacity "0.8"}}])])))
 
 (defn- empty-team []
@@ -62,17 +64,21 @@
   [{:keys [teams round-index group-index group-height]
     :as matchup-info}]
   (let [get-team (fn [teams index]
-                   (first (filter #(= index (:index %)) teams)))]
+                   ( first (filter #(= index (:index %)) teams)))
+        probs (subscribe [::subs/matchup teams])]
     (fn []
+      ; (log "probs" @probs)
+      ; (log "team 1 win " (:team-1-win @probs))
+      ; (log "team 2 win " (:team-2-win @probs))
       (log "matchup" teams)
       [:div.flex.flex-col.justify-center
        {:style {:height (str group-height "%")}}
        [:ul.list-reset.py-3
         (if-let [t0 (get-team teams 0)]
-          [team-item t0 (assoc matchup-info :index (:index t0))]
+          [team-item t0 (assoc matchup-info :index (:index t0)) probs]
           [empty-team])
         (if-let [t1 (get-team teams 1)]
-          [team-item t1 (assoc matchup-info :index (:index t1))]
+          [team-item t1 (assoc matchup-info :index (:index t1)) probs]
           [empty-team])]])))
 
 (defn round [region color round-index]

@@ -8,7 +8,8 @@
 
 (reg-sub
   ::matchup
-  (fn [db [_ matchup]]))
+  (fn [db [_ [team-1 team-2]]]
+    (get-in db [:matchups [(:id team-1) (:id team-2)]])))
 
 (reg-sub
   ::bracket

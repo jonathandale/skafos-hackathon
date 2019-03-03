@@ -38,35 +38,34 @@
 (re-frame/reg-event-fx
   ::get-matchup
   (fn-traced [{:keys [db]} [_ [team-1 team-2]]]
-    (log "team1" team-1)
-    (log "team2" team-2)
     {:db (-> db
            (dissoc :matchup :get-matchup-error)
            (assoc :fetching? true))
-           ; {"team1" : {"type" : "text", "value" : "1231"}, "team2" : {"type": "text", "value" : "1532"}}
      :http-xhrio (merge base-request
                    {:headers         {:X-API-TOKEN config/x-api-token}
                     :method          :get
-                    ; :params          {:where
-                    ;                   (app.utils/clj->json
-                    ;                      {"team1" {"type" "text"
-                    ;                                "value" (:id team1)}
-                    ;                       "team2" {"type" "text"
-                    ;                                "value" (:id team2)}})}
+                    :params          {:where
+                                      (app.utils/clj->json
+                                         {"team1" {"type" "text"
+                                                   "value" (:id team-1)}
+                                          "team2" {"type" "text"
+                                                   "value" (:id team-2)}})}
                     :uri             (str config/api-url
                                       "/data/cb571a77b504cc24ebc883d0/matchups")
 
-                    :on-success      [:get-matchup-success]
-                    :on-failure      [:get-matchup-error]})}))
+                    :on-success      [::get-matchup-success]
+                    :on-failure      [::get-matchup-error]})}))
 
 (re-frame/reg-event-fx
  ::get-matchup-success
  [->kebab-case]
  (fn-traced [{:keys [db]} [_ results]]
-   (log "matchup results" results)
-   {:db (-> db
-         (assoc :matchups results)
-         (dissoc :fetching?))}))
+   (let [data (first (:data results))
+         team-1 (:team-1 data)
+         team-2 (:team-2 data)]
+      {:db (-> db
+            (assoc-in [:matchups [team-1 team-2]] (:prob data))
+            (dissoc :fetching?))})))
 
 (re-frame/reg-event-fx
  ::get-matchup-error
