@@ -14,3 +14,8 @@
   ::bracket
   (fn [db [_ region round]]
     (nth (get-in db [:bracket region]) round)))
+
+(reg-sub
+  ::bracket-contender
+  (fn [db [_ region]]
+    (get-in db [:region-contender region])))

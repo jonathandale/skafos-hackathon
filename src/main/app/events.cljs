@@ -38,8 +38,6 @@
 (re-frame/reg-event-fx
   ::get-matchup
   (fn-traced [{:keys [db]} [_ [team-1 team-2]]]
-    (log "team1" team-1)
-    (log "team2" team-2)
     {:db (-> db
            (dissoc :matchup :get-matchup-error)
            (assoc :fetching? true))
@@ -98,6 +96,8 @@
                              (assoc team :index (if (even? group-index)
                                                   0 1))))))]
       (merge
-        {:db updated-db}
+        {:db (cond-> updated-db
+               (nil? next-round)
+               (assoc-in [:region-contender region] team))}
         (when (= 1 (count (nth next-round next-group)))
           {:dispatch [::get-matchup teams]})))))
