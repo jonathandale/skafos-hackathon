@@ -6,7 +6,7 @@
             [app.utils :refer [log]]))
 
 (def base-team-classes
-  ["rounded-sm" "text-sm" "px-2" "py-1" "mx-1"])
+  ["rounded-sm" "text-sm" "px-2" "py-2" "mx-1"])
 
 (def active-team-classes
   (into base-team-classes
@@ -97,28 +97,68 @@
                         :group-height group-height}])
            @round-teams)]))))
 
+(defn- final-four-matchup [title team1 team2]
+  (fn []
+    [:div.w-1:3.px-2.mb-2
+     [:div
+      [:p.text-3xl.font-light.text-grey-dark.mb-3.text-center
+       title]
+      [:div.flex.text-center
+       [:p.bg-white.w-1:2.mx-1.p-4.rounded-sm
+        [:span.mr-1 (if @team1
+                      (:name @team1)
+                      "------")]
+        [:span.opacity-75 (:ranking @team1)]]
+       [:p.bg-white.w-1:2.mx-1.p-4.rounded-sm
+        [:span.mr-1 (if @team2
+                      (:name @team2)
+                      "------")]
+        [:span.opacity-75 (:ranking @team2)]]]]]))
+
+(defn final-four []
+  (let [east (subscribe [::subs/bracket-contender :east])
+        west (subscribe [::subs/bracket-contender :west])
+        midwest (subscribe [::subs/bracket-contender :midwest])
+        south (subscribe [::subs/bracket-contender :south])]
+    (fn []
+      [:div.p-8.bg-grey-darkest.flex
+       [final-four-matchup "East vs Midwest" east midwest]
+       [final-four-matchup "Championship" (atom nil) (atom nil)]
+       [final-four-matchup "West vs South" west south]])))
+
 (defn render []
   [:div
-   [:div.flex
-    [:div.flex.w-1:2.p-4
-     [round :east :grey 0]
-     [round :east :grey 1]
-     [round :east :grey 2]
-     [round :east :grey 3]]
-    [:div.flex.w-1:2.p-4
-     [round :west :grey 3]
-     [round :west :grey 2]
-     [round :west :grey 1]
-     [round :west :grey 0]]]
-   [:div.p-8.bg-grey-lighter]
-   [:div.flex
-    [:div.flex.w-1:2.p-4
-     [round :midwest :grey 0]
-     [round :midwest :grey 1]
-     [round :midwest :grey 2]
-     [round :midwest :grey 3]]
-    [:div.flex.w-1:2.p-4
-     [round :south :grey 3]
-     [round :south :grey 2]
-     [round :south :grey 1]
-     [round :south :grey 0]]]])
+   [:div.px-8.pt-8.bg-grey-lightest.text-center
+    [:p.text-3xl.font-light.text-grey-darker
+     "NCAA 2019 Men's basketball " [:span.text-grey " Un"] "Official Bracket"]]
+   [:div.flex.m-8.bg-white.rounded.shadow
+    [:div.w-1:2.p-6
+     [:p.font-light.text-2xl.p-1.text-grey-dark "East"]
+     [:div.flex.w-full
+      [round :east :grey 0]
+      [round :east :grey 1]
+      [round :east :grey 2]
+      [round :east :grey 3]]]
+    [:div.w-1:2.p-6
+     [:p.font-light.text-2xl.p-1.text-right.text-grey-dark "West"]
+     [:div.flex.w-full
+      [round :west :grey 3]
+      [round :west :grey 2]
+      [round :west :grey 1]
+      [round :west :grey 0]]]]
+   [final-four]
+   [:div.flex.m-8.bg-white.rounded.shadow
+    [:div.w-1:2.p-6
+     [:p.font-light.text-2xl.p-1.text-grey-dark "Midwest"]
+     [:div.flex.w-full
+      [round :midwest :grey 0]
+      [round :midwest :grey 1]
+      [round :midwest :grey 2]
+      [round :midwest :grey 3]]]
+    [:div.w-1:2.p-6
+     [:p.font-light.text-2xl.p-1.text-right.text-grey-dark "South"]
+     [:div.flex.w-full
+      [round :south :grey 3]
+      [round :south :grey 2]
+      [round :south :grey 1]
+      [round :south :grey 0]]]]])

@@ -97,6 +97,8 @@
                              (assoc team :index (if (even? group-index)
                                                   0 1))))))]
       (merge
-        {:db updated-db}
+        {:db (cond-> updated-db
+               (nil? next-round)
+               (assoc-in [:region-contender region] team))}
         (when (= 1 (count (nth next-round next-group)))
           {:dispatch [::get-matchup teams]})))))
