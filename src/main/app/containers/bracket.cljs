@@ -28,16 +28,12 @@
 (defn- team-item [team matchup-info]
   (fn []
     (let [disabled? (some :selected (:teams matchup-info))]
-      [:li
       [:li.relative
        {:on-click #(when-not disabled?
                      (dispatch [::events/select-team matchup-info]))
         :class (if disabled?
                  inactive-team-classes
                  active-team-classes)}
-       [:p.text-xs
-        [:span (:name team)]
-        [:span.opacity-50 (str " ("(:ranking team)")")]]])))
        [:div.relative.z-10
         [:p.text-xs (:name team)]
         [:p.text-xs.opacity-75 "#" (:ranking team)]]
@@ -46,7 +42,6 @@
                  :opacity "0.4"}}]])))
 
 (defn- empty-team []
-  [:li {:class pending-team-classes} "."])
   [:li {:class pending-team-classes}
    [:p.text-xs "."]
    [:p.text-xs "."]])
@@ -69,8 +64,6 @@
   (let [round-teams (subscribe [::subs/bracket round-index])]
     (fn []
       (let [group-height (/ 100 (count @round-teams))]
-        [:ul.list-reset.mr-2
-         {:class "w-1/4"}
         [:ul.list-reset
          {:class "w-1/5"}
          (map-indexed
