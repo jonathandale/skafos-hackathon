@@ -79,27 +79,27 @@
 
 
 ;; Bracket events
-(defn- calc-next-position [round-index team-index group-index next-round]
+(defn- calc-next-position [round-index index group-index next-round]
   (.floor js/Math (/ (* (- 2 round-index) group-index)
                      (count next-round))))
 
 (re-frame/reg-event-fx
   ::select-team
   (fn-traced
-    [{db :db} [_ {:keys [round-index group-index team-index teams region]}]]
+    [{db :db}
+     [_ team {:keys [round-index group-index index teams region]}]]
     (let [next-round (get-in db [:bracket region (inc round-index)])
-          next-group (calc-next-position round-index team-index group-index next-round)
-          team (nth teams team-index)
+          next-group (calc-next-position round-index index group-index next-round)
           updated-db (-> db
-                       (update-in [:bracket region round-index group-index team-index]
+                       (update-in [:bracket region round-index group-index index]
                          (fn [team]
                            (assoc team :selected true)))
                        (update-in [:bracket region (inc round-index) next-group]
                          (fn [new-group]
-                           (conj new-group team))))]
-        (prn "next round" next-round)
-        (prn "next group" next-group)
-        (merge
-          {:db updated-db}
-          (when (= 1 (count (nth next-round next-group)))
-            {:dispatch [::get-matchup teams]})))))
+                           (conj new-group
+                             (assoc team :index (if (even? group-index)
+                                                  0 1))))))]
+      (merge
+        {:db updated-db}
+        (when (= 1 (count (nth next-round next-group)))
+          {:dispatch [::get-matchup teams]})))))

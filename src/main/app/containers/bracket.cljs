@@ -6,60 +6,76 @@
             [app.utils :refer [log]]))
 
 (def base-team-classes
-  ["rounded-sm" "text-sm" "px-2" "py-1" "m-1"])
+  ["rounded-sm" "text-sm" "px-2" "py-1" "mx-1"])
 
 (def active-team-classes
-  (concat
-    base-team-classes
-    ["hover:bg-grey-darker" "bg-grey-darkest" "cursor-pointer"
-     "text-white"]))
+  (into base-team-classes
+    ["cursor-pointer" "text-white"]))
 
 (def inactive-team-classes
-  (concat
-    base-team-classes
-    ["opacity-50" "bg-grey"]))
+  (into base-team-classes
+    ["bg-grey-lighter"]))
+
+(def selected-team-classes
+  (into base-team-classes
+    ["bg-grey"]))
 
 (def pending-team-classes
-  (concat
-    base-team-classes
-    ["bg-grey-lighter" "text-grey-lighter"]))
+  (into base-team-classes
+    ["bg-grey-lighter" "text-grey-lighter" "rounded-b-none" "border-b" "border-white"]))
 
 (defn- team-item [team matchup-info]
   (fn []
     (let [disabled? (some :selected (:teams matchup-info))]
       [:li.relative
        {:on-click #(when-not disabled?
-                     (dispatch [::events/select-team matchup-info]))
-        :class (if disabled?
-                 inactive-team-classes
-                 active-team-classes)}
+                     (dispatch [::events/select-team team matchup-info]))
+        :class (concat
+                 (cond
+                   (true? (:selected team))
+                   selected-team-classes
+
+                   (some? disabled?)
+                   inactive-team-classes
+
+                   :else
+                   active-team-classes)
+                 (if (= 1 (:seed team))
+                   ["rounded-b-none" "border-b" "border-white"]
+                   ["rounded-t-none"])
+                 [(str "bg-" (name (:color matchup-info)) "-darker")])}
        [:div.relative.z-10
-        [:p.text-xs (:name team)]
-        [:p.text-xs.opacity-75 "#" (:ranking team)]]
-       [:div.absolute.pin-y.pin-l.bg-pink-dark
-        {:style {:width "29%"
-                 :opacity "0.8"}}]])))
+        [:p [:span.text-xs.opacity-75 (:ranking team)]
+            [:span.text-xs " " (:name team)]]]
+       (when-not disabled?
+         [:div.absolute.pin-y.pin-l.rounded-sm.rounded-r-none
+          {:class [(str "bg-" (name (:color matchup-info)) "-darkest")]
+           :style {:width "29%"
+                   :opacity "0.8"}}])])))
 
 (defn- empty-team []
   [:li {:class pending-team-classes}
-   [:p.text-xs "."]
-   [:p.text-xs "."]])
+   [:p [:span.text-xs.opacity-75 "."]
+       [:span.text-xs "."]]])
 
 (defn- matchup
   [{:keys [teams round-index group-index group-height]
     :as matchup-info}]
-  (fn []
-    [:div.flex.flex-col.justify-center
-     {:style {:height (str group-height "%")}}
-     [:ul.list-reset.my-3
-      (if-let [t1 (first teams)]
-        [team-item t1 (assoc matchup-info :team-index 0)]
-        [empty-team])
-      (if-let [t2 (second teams)]
-        [team-item t2 (assoc matchup-info :team-index 1)]
-        [empty-team])]]))
+  (let [get-team (fn [teams index]
+                   (first (filter #(= index (:index %)) teams)))]
+    (fn []
+      (log "matchup" teams)
+      [:div.flex.flex-col.justify-center
+       {:style {:height (str group-height "%")}}
+       [:ul.list-reset.py-3
+        (if-let [t0 (get-team teams 0)]
+          [team-item t0 (assoc matchup-info :index (:index t0))]
+          [empty-team])
+        (if-let [t1 (get-team teams 1)]
+          [team-item t1 (assoc matchup-info :index (:index t1))]
+          [empty-team])]])))
 
-(defn round [region round-index]
+(defn round [region color round-index]
   (let [round-teams (subscribe [::subs/bracket region round-index])]
     (fn []
       (let [group-height (/ 100 (count @round-teams))]
@@ -69,6 +85,7 @@
              ^{:key (str group-index round-index teams)}
               [matchup {:teams teams
                         :region region
+                        :color color
                         :round-index round-index
                         :group-index group-index
                         :group-height group-height}])
@@ -77,26 +94,25 @@
 (defn render []
   [:div
    [:div.flex
-    [:div.flex.w-4:9
-     [round :east 0]
-     [round :east 1]
-     [round :east 2]
-     [round :east 3]]
-    [:div.flex.w-1:9]
-    [:div.flex.w-4:9
-     [round :west 3]
-     [round :west 2]
-     [round :west 1]
-     [round :west 0]]]
+    [:div.flex.w-1:2.p-4
+     [round :east :grey 0]
+     [round :east :grey 1]
+     [round :east :grey 2]
+     [round :east :grey 3]]
+    [:div.flex.w-1:2.p-4
+     [round :west :grey 3]
+     [round :west :grey 2]
+     [round :west :grey 1]
+     [round :west :grey 0]]]
+   [:div.p-8.bg-grey-lighter]
    [:div.flex
-    [:div.flex.w-4:9
-     [round :midwest 0]
-     [round :midwest 1]
-     [round :midwest 2]
-     [round :midwest 3]]
-    [:div.flex.w-1:9]
-    [:div.flex.w-4:9
-     [round :south 3]
-     [round :south 2]
-     [round :south 1]
-     [round :south 0]]]])
+    [:div.flex.w-1:2.p-4
+     [round :midwest :grey 0]
+     [round :midwest :grey 1]
+     [round :midwest :grey 2]
+     [round :midwest :grey 3]]
+    [:div.flex.w-1:2.p-4
+     [round :south :grey 3]
+     [round :south :grey 2]
+     [round :south :grey 1]
+     [round :south :grey 0]]]])
