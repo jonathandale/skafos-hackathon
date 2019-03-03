@@ -27,7 +27,6 @@
 (defn- team-item [team matchup-info probs]
   (fn []
     (let [disabled? (some :selected (:teams matchup-info))]
-      (log "win prob" @probs)
       [:li.relative
        {:on-click #(when-not disabled?
                      (dispatch [::events/select-team team matchup-info]))
@@ -69,6 +68,7 @@
     (fn []
       [:div.flex.flex-col.justify-center
        {:style {:height (str group-height "%")}}
+       [:p (str @probs)]
        [:ul.list-reset.py-3
         (if-let [t0 (get-team teams 0)]
           [team-item t0 (assoc matchup-info :index (:index t0)) probs]
