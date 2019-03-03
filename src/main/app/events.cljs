@@ -80,6 +80,12 @@
   (.floor js/Math (/ (* (- 2 round-index) group-index)
                      (count next-round))))
 
+; (re-frame/reg-event-fx
+;   ::select-region-contender
+;   (fn-traced
+;     [{db :db
+;       [_]}]))
+
 (re-frame/reg-event-fx
   ::select-team
   (fn-traced

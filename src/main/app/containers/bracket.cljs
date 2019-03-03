@@ -67,9 +67,6 @@
                    ( first (filter #(= index (:index %)) teams)))
         probs (subscribe [::subs/matchup teams])]
     (fn []
-      ; (log "probs" @probs)
-      ; (log "team 1 win " (:team-1-win @probs))
-      ; (log "team 2 win " (:team-2-win @probs))
       (log "matchup" teams)
       [:div.flex.flex-col.justify-center
        {:style {:height (str group-height "%")}}
@@ -105,9 +102,11 @@
        title]
       [:div.flex.text-center
        [:p.bg-white.w-1:2.mx-1.p-4.rounded-sm
-        [:span.mr-1 (if @team1
-                      (:name @team1)
-                      "------")]
+        [:span.mr-1
+          {:on-click #(prn "hi")}
+          (if @team1
+            (:name @team1)
+            "------")]
         [:span.opacity-75 (:ranking @team1)]]
        [:p.bg-white.w-1:2.mx-1.p-4.rounded-sm
         [:span.mr-1 (if @team2
