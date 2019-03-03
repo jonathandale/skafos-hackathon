@@ -19,10 +19,16 @@
   {:timeout         10000
    :response-format (ajax/json-response-format {:keywords? true})})
 
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
  ::initialize-db
- (fn-traced [_]
-   db/default-db))
+ (fn-traced [{:keys [db]} [_]]
+   {:db db/default-db
+    :dispatch-n
+      (mapv
+        (fn [matchup]
+          [::get-matchup matchup])
+        (concat db/east db/west))}))
+
 
 (re-frame/reg-event-db
  ::set-page
@@ -79,6 +85,12 @@
 (defn- calc-next-position [round-index index group-index next-round]
   (.floor js/Math (/ (* (- 2 round-index) group-index)
                      (count next-round))))
+
+; (re-frame/reg-event-fx
+;   ::select-region-contender
+;   (fn-traced
+;     [{db :db
+;       [_]}]))
 
 (re-frame/reg-event-fx
   ::select-team
