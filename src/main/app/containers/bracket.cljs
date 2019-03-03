@@ -48,11 +48,12 @@
         [:p.truncate
          [:span.text-xs.opacity-75 (:ranking team)]
          [:span.text-xs " " (:name team)]]]
-       (when-not disabled?
-         [:div.absolute.pin-y.pin-l.rounded-sm.rounded-r-none
-          {:class [(str "bg-" (name (:color matchup-info)) "-darkest")]
-           :style {:width (str (* 10 probs) "%")
-                   :opacity "0.8"}}])])))
+       (when-not (and (some? @probs) disabled?)
+         (let [win-% (* 100 (get @probs (keyword (str "team-" (inc (:index team)) "-win"))))]
+           [:div.absolute.pin-y.pin-l.rounded-sm.rounded-r-none
+            {:class [(str "bg-" (name (:color matchup-info)) "-darkest")]
+             :style {:width (str win-% "%")
+                     :opacity "0.8"}}]))])))
 
 (defn- empty-team []
   [:li {:class pending-team-classes}
@@ -68,7 +69,6 @@
     (fn []
       [:div.flex.flex-col.justify-center
        {:style {:height (str group-height "%")}}
-       [:p (str @probs)]
        [:ul.list-reset.py-3
         (if-let [t0 (get-team teams 0)]
           [team-item t0 (assoc matchup-info :index (:index t0)) probs]
