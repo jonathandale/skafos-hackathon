@@ -152,7 +152,7 @@
 
 (defn render []
   [:div
-   [:div.px-8.pt-8.bg-grey-lightest.text-center
+   [:div.px-8.pt-8.text-center
     [:p.text-3xl.font-light.text-grey-darker
      "NCAA 2019 Men's basketball " [:span.text-grey " Un"] "Official Bracket"]]
    [:div.flex.m-8.bg-white.rounded.shadow
