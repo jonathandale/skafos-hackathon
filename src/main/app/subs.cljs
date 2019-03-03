@@ -21,6 +21,12 @@
   (fn [db [_ region]]
     (get-in db [:region-contender region])))
 
-; (reg-sub
-;   ::final-match
-;   (fn [db [_]]))
+(reg-sub
+  ::finalist
+  (fn [db [_ position]]
+    (get-in db [:finalists position])))
+
+(reg-sub
+  ::winner
+  (fn [db [_]]
+    (:winner db)))

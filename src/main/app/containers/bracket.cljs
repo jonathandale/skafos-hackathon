@@ -27,7 +27,6 @@
 (defn- team-item [team matchup-info probs]
   (fn []
     (let [disabled? (some :selected (:teams matchup-info))]
-      (log "win prob" @probs)
       [:li.relative
        {:on-click #(when-not disabled?
                      (dispatch [::events/select-team team matchup-info]))
@@ -46,9 +45,9 @@
                    ["rounded-t-none"])
                  [(str "bg-" (name (:color matchup-info)) "-darker")])}
        [:div.relative.z-10
-        [:p [:span.text-xs.opacity-75 (:ranking team)]
-            [:span.text-xs " " (:name team)]
-            [:span.text-xs " " probs]]]
+        [:p.truncate
+         [:span.text-xs.opacity-75 (:ranking team)]
+         [:span.text-xs " " (:name team)]]]
        (when-not disabled?
          [:div.absolute.pin-y.pin-l.rounded-sm.rounded-r-none
           {:class [(str "bg-" (name (:color matchup-info)) "-darkest")]
@@ -67,9 +66,9 @@
                    ( first (filter #(= index (:index %)) teams)))
         probs (subscribe [::subs/matchup teams])]
     (fn []
-      (log "matchup" teams)
       [:div.flex.flex-col.justify-center
        {:style {:height (str group-height "%")}}
+       [:p (str @probs)]
        [:ul.list-reset.py-3
         (if-let [t0 (get-team teams 0)]
           [team-item t0 (assoc matchup-info :index (:index t0)) probs]
@@ -94,25 +93,51 @@
                         :group-height group-height}])
            @round-teams)]))))
 
-(defn- final-four-matchup [title team1 team2]
+(defn- championship []
+  (let [team1 (subscribe [::subs/finalist :team-1])
+        team2 (subscribe [::subs/finalist :team-2])]
+    (fn []
+      [:div.w-1:3.px-2.mb-2
+       [:div
+        [:p.text-3xl.font-light.text-grey-dark.mb-3.text-center
+         "Championship"]
+        [:div.flex.text-center
+         [:p.bg-indigo.w-1:2.mx-1.p-4.rounded-sm.truncate.text-white
+          [:span.mr-1 (if @team1
+                        (:name @team1)
+                        "------")]
+          (when @team1 [:span.opacity-50 "(" (:ranking @team1) ")"])]
+         [:p.bg-indigo.w-1:2.mx-1.p-4.rounded-sm.truncate.text-white
+          [:span.mr-1 (if @team2
+                        (:name @team2)
+                        "------")]
+          (when @team2 [:span.opacity-50 "(" (:ranking @team2) ")"])]]]])))
+
+(defn- final-four-team [team position]
+  (let [selected (subscribe [::subs/finalist position])]
+    (fn []
+      (log @selected)
+      [:p.bg-white.w-1:2.mx-1.p-4.rounded-sm.truncate
+       {:on-click #(when-not @selected
+                     (dispatch [::events/set-finalist position @team]))
+        :class (when-not @selected
+                 ["hover:bg-grey-light"
+                  "cursor-pointer"])}
+       [:span.mr-1 (if @team
+                     (:name @team)
+                     "------")]
+       (when @team [:span.opacity-50 "(" (:ranking @team) ")"])])))
+
+(defn- final-four-matchup [title team1 team2 position]
+  (let [])
   (fn []
     [:div.w-1:3.px-2.mb-2
      [:div
       [:p.text-3xl.font-light.text-grey-dark.mb-3.text-center
        title]
       [:div.flex.text-center
-       [:p.bg-white.w-1:2.mx-1.p-4.rounded-sm
-        [:span.mr-1
-          {:on-click #(prn "hi")}
-          (if @team1
-            (:name @team1)
-            "------")]
-        [:span.opacity-75 (:ranking @team1)]]
-       [:p.bg-white.w-1:2.mx-1.p-4.rounded-sm
-        [:span.mr-1 (if @team2
-                      (:name @team2)
-                      "------")]
-        [:span.opacity-75 (:ranking @team2)]]]]]))
+       [final-four-team team1 position]
+       [final-four-team team2 position]]]]))
 
 (defn final-four []
   (let [east (subscribe [::subs/bracket-contender :east])
@@ -121,9 +146,9 @@
         south (subscribe [::subs/bracket-contender :south])]
     (fn []
       [:div.p-8.bg-grey-darkest.flex
-       [final-four-matchup "East vs Midwest" east midwest]
-       [final-four-matchup "Championship" (atom nil) (atom nil)]
-       [final-four-matchup "West vs South" west south]])))
+       [final-four-matchup "East vs Midwest" east midwest :team-1]
+       [championship]
+       [final-four-matchup "West vs South" west south :team-2]])))
 
 (defn render []
   [:div

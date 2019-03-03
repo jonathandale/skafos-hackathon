@@ -107,4 +107,11 @@
                (nil? next-round)
                (assoc-in [:region-contender region] team))}
         (when (= 1 (count (nth next-round next-group)))
-          {:dispatch [::get-matchup teams]})))))
+          {:dispatch [::get-matchup [(first (nth next-round next-group))
+                                     team]]})))))
+
+
+(re-frame/reg-event-db
+  ::set-finalist
+  (fn-traced [db [_ position team]]
+    (assoc-in db [:finalists position] team)))
