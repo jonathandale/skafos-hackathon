@@ -40,8 +40,8 @@
    [{:name "Cincinatti" :seed 1  :ranking 7 :id "4007"} {:name "NC State" :seed 2  :ranking 10 :id "4010"}]
    [{:name "Michigan State" :seed 1  :ranking 2 :id "4002"} {:name "Northern Kentucky" :seed 2  :ranking 15 :id "4015"}]])
 
-(def bracket
-  [east
+(defn bracket [region]
+  [region
    [[]
     []
     []
@@ -51,4 +51,7 @@
    [[]]])
 
 (def default-db
-  {:bracket bracket})
+  {:bracket {:east (bracket east)
+             :west (bracket west)
+             :midwest (bracket midwest)
+             :south (bracket south)}})

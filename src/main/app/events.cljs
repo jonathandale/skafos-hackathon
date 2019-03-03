@@ -65,7 +65,7 @@
  ::get-matchup-success
  [->kebab-case]
  (fn-traced [{:keys [db]} [_ results]]
-   (prn "matchup results" results)
+   (log "matchup results" results)
    {:db (-> db
          (assoc :matchups results)
          (dissoc :fetching?))}))
@@ -78,7 +78,6 @@
      (dissoc :fetching?))))
 
 
-
 ;; Bracket events
 (defn- calc-next-position [round-index team-index group-index next-round]
   (.floor js/Math (/ (* (- 2 round-index) group-index)
@@ -86,18 +85,16 @@
 
 (re-frame/reg-event-fx
   ::select-team
-  (fn-traced [{db :db} [_ {:keys [round-index
-                                  group-index
-                                  team-index
-                                  teams]}]]
-    (let [next-round (get-in db [:bracket (inc round-index)])
+  (fn-traced
+    [{db :db} [_ {:keys [round-index group-index team-index teams region]}]]
+    (let [next-round (get-in db [:bracket region (inc round-index)])
           next-group (calc-next-position round-index team-index group-index next-round)
           team (nth teams team-index)
           updated-db (-> db
-                       (update-in [:bracket round-index group-index team-index]
+                       (update-in [:bracket region round-index group-index team-index]
                          (fn [team]
                            (assoc team :selected true)))
-                       (update-in [:bracket (inc round-index) next-group]
+                       (update-in [:bracket region (inc round-index) next-group]
                          (fn [new-group]
                            (conj new-group team))))]
         (prn "next round" next-round)
