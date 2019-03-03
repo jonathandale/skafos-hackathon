@@ -10,7 +10,7 @@
 
 (def active-team-classes
   (into base-team-classes
-    ["cursor-pointer" "text-white"]))
+    ["cursor-pointer" "text-white" "hover:bg-grey-darkest"]))
 
 (def inactive-team-classes
   (into base-team-classes
@@ -51,7 +51,8 @@
        (when-not (and (some? @probs) disabled?)
          (let [win-% (* 100 (get @probs (keyword (str "team-" (inc (:index team)) "-win"))))]
            [:div.absolute.pin-y.pin-l.rounded-sm.rounded-r-none
-            {:class [(str "bg-" (name (:color matchup-info)) "-darkest")]
+            ; {:class [(str "bg-" (name (:color matchup-info)) "-darkest")]}
+            {:class ["bg-black"]
              :style {:width (str win-% "%")
                      :opacity "0.85"}}]))])))
 
