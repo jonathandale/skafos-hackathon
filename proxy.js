@@ -5,12 +5,15 @@ const chalk = require('chalk');
 const api_app = express();
 console.log(argv);
 const onProxyRes = function(proxyRes, req, res){
+  if(req.method === 'OPTIONS') {
+    proxyRes.headers['Access-Control-Allow-Headers'] = 'GET, x-api-token';
+  }
   proxyRes.headers['Access-Control-Allow-Origin'] = 'http://localhost:8280';
 };
 
 const apiUrl = 'https://api.metismachine.io';
 
-api_app.use('/v1/data/cb571a77b504cc24ebc883d0/matchups', proxy({target: apiUrl, changeOrigin: true, onProxyRes: onProxyRes}));
+api_app.use('/v1', proxy({target: apiUrl, changeOrigin: true, onProxyRes: onProxyRes}));
 api_app.listen(4000);
 
 console.log(`\nRunning ${chalk.blue('api')} proxy on port 4000`);

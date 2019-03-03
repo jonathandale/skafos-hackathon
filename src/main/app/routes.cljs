@@ -12,9 +12,6 @@
 
 (defn app-routes []
   (defroute "/" []
-    (re-frame/dispatch [::events/set-page :home]))
-
-  ; (defroute "*" []
-  ;   (re-frame/dispatch [::events/set-page :not-found]))
+    (re-frame/dispatch [::events/set-page :bracket]))
 
   (pushy/start! history/history))

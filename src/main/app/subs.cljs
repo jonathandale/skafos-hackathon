@@ -12,5 +12,5 @@
 
 (reg-sub
   ::bracket
-  (fn [db [_ round]]
-    (nth (:bracket db) round)))
+  (fn [db [_ region round]]
+    (nth (get-in db [:bracket region]) round)))

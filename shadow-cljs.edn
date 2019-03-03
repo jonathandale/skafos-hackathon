@@ -21,7 +21,8 @@
                  :asset-path "/js/compiled"
                  :modules    {:base {:entries [app.core]}}
                  :dev        {:compiler-options {:closure-defines {re_frame.trace.trace_enabled?        true
-                                                                   day8.re-frame.tracing.trace-enabled? true}}}
+                                                                   day8.re-frame.tracing.trace-enabled? true
+                                                                   "app.config.X_API_TOKEN" #shadow/env "X_API_TOKEN"}}}
                  :devtools   {:http-root    "public"
                               :http-handler shadow.http.push-state/handle
                               :http-port    8280
@@ -31,7 +32,8 @@
                  :release {:compiler-options {:source-map true
                                               :optimizations :advanced
                                               :infer-externs :auto
-                                              :closure-defines {"app.config.API_URL" ""}}}}
+                                              :closure-defines {"app.config.API_URL" ""
+                                                                "app.config.X_API_TOKEN" #shadow/env "X_API_TOKEN"}}}}
 
                 :browser-test
                 {:target           :browser-test

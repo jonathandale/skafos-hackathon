@@ -42,18 +42,18 @@
           (dissoc :matchup :get-matchup-error)
           (assoc :fetching? true))
     :http-xhrio (merge base-request
-                  {:headers         {"X-API-TOKEN" "a3c6df8ff9e507ccfbae15966d883747"}
+                  {:headers         {:X-API-TOKEN config/x-api-token}
                    :method          :get
                    :uri             (str config/api-url
-                                         "/data/cb571a77b504cc24ebc883d0/matchup")
-                   :on-success      [:get-matchup-success]
-                   :on-failure      [:get-matchup-error]})}))
+                                         "/data/cb571a77b504cc24ebc883d0/matchups")
+                   :on-success      [::get-matchup-success]
+                   :on-failure      [::get-matchup-error]})}))
 
 (re-frame/reg-event-fx
  ::get-matchup-success
  [->kebab-case]
  (fn-traced [{:keys [db]} [_ results]]
-   (prn "matchup results" results)
+   (log "matchup results" results)
    {:db (-> db
          (assoc :matchups results)
          (dissoc :fetching?))}))
@@ -67,7 +67,6 @@
      (dissoc :fetching?))))
 
 
-
 ;; Bracket events
 (defn- calc-next-position [round-index team-index group-index next-round]
   (.floor js/Math (/ (* (- 2 round-index) group-index)
@@ -75,23 +74,19 @@
 
 (re-frame/reg-event-fx
   ::select-team
-  (fn-traced [{db :db} [_ {:keys [round-index
-                                  group-index
-                                  team-index
-                                  teams]}]]
-    (let [next-round (get-in db [:bracket (inc round-index)])
+  (fn-traced
+    [{db :db} [_ {:keys [round-index group-index team-index teams region]}]]
+    (let [next-round (get-in db [:bracket region (inc round-index)])
           next-group (calc-next-position round-index team-index group-index next-round)
           team (nth teams team-index)
           updated-db (-> db
-                       (update-in [:bracket round-index group-index team-index]
+                       (update-in [:bracket region round-index group-index team-index]
                          (fn [team]
                            (assoc team :selected true)))
-                       (update-in [:bracket (inc round-index) next-group]
+                       (update-in [:bracket region (inc round-index) next-group]
                          (fn [new-group]
                            (conj new-group team))))]
-        (prn "next round" next-round)
-        (prn "next group" next-group)
-        (merge
-          {:db updated-db}
-          (when (= 1 (count (nth next-round next-group)))
-            {:dispatch [::get-matchup]})))))
+      (merge
+        {:db updated-db}
+        (when (= 1 (count (nth next-round next-group)))
+          {:dispatch [::get-matchup]})))))

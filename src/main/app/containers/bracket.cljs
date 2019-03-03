@@ -5,7 +5,6 @@
             [app.events :as events]
             [app.utils :refer [log]]))
 
-
 (def base-team-classes
   ["rounded-sm" "text-sm" "px-2" "py-1" "m-2"])
 
@@ -60,8 +59,8 @@
         [team-item t2 (assoc matchup-info :team-index 1)]
         [empty-team])]]))
 
-(defn round [round-index]
-  (let [round-teams (subscribe [::subs/bracket round-index])]
+(defn round [region round-index]
+  (let [round-teams (subscribe [::subs/bracket region round-index])]
     (fn []
       (let [group-height (/ 100 (count @round-teams))]
         [:ul.list-reset
@@ -70,6 +69,7 @@
            (fn [group-index teams]
              ^{:key (str group-index round-index teams)}
               [matchup {:teams teams
+                        :region region
                         :round-index round-index
                         :group-index group-index
                         :group-height group-height}])
@@ -79,7 +79,7 @@
   [:div.flex
    [:div.flex.h-screen.relative.px-6
     {:class "w-1/2"}
-    [round 0]
-    [round 1]
-    [round 2]
-    [round 3]]])
+    [round :east 0]
+    [round :east 1]
+    [round :east 2]
+    [round :east 3]]])
