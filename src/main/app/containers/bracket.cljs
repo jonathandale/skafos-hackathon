@@ -22,7 +22,7 @@
 
 (def pending-team-classes
   (into base-team-classes
-    ["bg-grey-lighter" "text-grey-lighter" "rounded-b-none" "border-b" "border-white"]))
+    ["bg-grey-light" "text-grey-light" "rounded-b-none" "border-b" "border-white"]))
 
 (defn- team-item [team matchup-info probs]
   (fn []
