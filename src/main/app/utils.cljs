@@ -17,3 +17,6 @@
 
 (defn log [& args]
   (apply js/console.log args))
+
+(defn clj->json [edn]
+  (.stringify js/JSON (clj->js edn)))

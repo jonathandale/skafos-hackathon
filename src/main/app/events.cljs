@@ -37,17 +37,29 @@
 ;; Round Probabilities
 (re-frame/reg-event-fx
   ::get-matchup
-  (fn-traced [{:keys [db]} [_]]
-   {:db (-> db
-          (dissoc :matchup :get-matchup-error)
-          (assoc :fetching? true))
-    :http-xhrio (merge base-request
-                  {:headers         {"X-API-TOKEN" "a3c6df8ff9e507ccfbae15966d883747"}
-                   :method          :get
-                   :uri             (str config/api-url
-                                         "/data/cb571a77b504cc24ebc883d0/matchup")
-                   :on-success      [:get-matchup-success]
-                   :on-failure      [:get-matchup-error]})}))
+  (fn-traced [{:keys [db]} [_ teams]]
+    (let [team1 (first teams)
+          team2 (last teams)]
+      (prn "team1" team1)
+      (prn "team2" team2)
+      {:db (-> db
+             (dissoc :matchup :get-matchup-error)
+             (assoc :fetching? true))
+             ; {"team1" : {"type" : "text", "value" : "1231"}, "team2" : {"type": "text", "value" : "1532"}}
+       :http-xhrio (merge base-request
+                     {:headers         {"authorization" "Bearer 9cfd5be7be07452c8bc689bd1967a1a79767dc299c9c2ff57d20406d599f3803"}
+                      :method          :get
+                      :params          {:where
+                                        (app.utils/clj->json
+                                           {"team1" {"type" "text"
+                                                     "value" (:id team1)}
+                                            "team2" {"type" "text"
+                                                     "value" (:id team2)}})}
+                      :uri             (str config/api-url
+                                        "/data/cb571a77b504cc24ebc883d0/matchups")
+
+                      :on-success      [:get-matchup-success]
+                      :on-failure      [:get-matchup-error]})})))
 
 (re-frame/reg-event-fx
  ::get-matchup-success
@@ -57,7 +69,6 @@
    {:db (-> db
          (assoc :matchups results)
          (dissoc :fetching?))}))
-
 
 (re-frame/reg-event-fx
  ::get-matchup-error
@@ -94,4 +105,4 @@
         (merge
           {:db updated-db}
           (when (= 1 (count (nth next-round next-group)))
-            {:dispatch [::get-matchup]})))))
+            {:dispatch [::get-matchup teams]})))))

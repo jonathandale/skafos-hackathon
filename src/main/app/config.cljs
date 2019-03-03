@@ -4,4 +4,4 @@
 
 (goog-define API_TOKEN "abc123")
 
-(def api-url "https://api.metismachine.io/v1")
+(def api-url "http://localhost:4000/v1")
