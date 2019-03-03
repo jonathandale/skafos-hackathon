@@ -7,18 +7,18 @@
 
 
 (def base-team-classes
-  ["rounded-sm" "text-sm" "px-2" "py-1" "my-1"])
+  ["rounded-sm" "text-sm" "px-2" "py-1" "m-2"])
 
 (def active-team-classes
   (concat
     base-team-classes
-    ["hover:bg-grey-dark" "bg-grey-darker" "cursor-pointer"
+    ["hover:bg-grey-darker" "bg-grey-darkest" "cursor-pointer"
      "text-white"]))
 
 (def inactive-team-classes
   (concat
     base-team-classes
-    ["bg-grey-light" "text-grey-dark"]))
+    ["opacity-50" "bg-grey"]))
 
 (def pending-team-classes
   (concat
@@ -29,6 +29,7 @@
   (fn []
     (let [disabled? (some :selected (:teams matchup-info))]
       [:li
+      [:li.relative
        {:on-click #(when-not disabled?
                      (dispatch [::events/select-team matchup-info]))
         :class (if disabled?
@@ -37,9 +38,18 @@
        [:p.text-xs
         [:span (:name team)]
         [:span.opacity-50 (str " ("(:ranking team)")")]]])))
+       [:div.relative.z-10
+        [:p.text-xs (:name team)]
+        [:p.text-xs.opacity-75 "#" (:ranking team)]]
+       [:div.absolute.pin-y.pin-l.bg-white
+        {:style {:width "29%"
+                 :opacity "0.4"}}]])))
 
 (defn- empty-team []
   [:li {:class pending-team-classes} "."])
+  [:li {:class pending-team-classes}
+   [:p.text-xs "."]
+   [:p.text-xs "."]])
 
 (defn- matchup
   [{:keys [teams round-index group-index group-height]
@@ -61,6 +71,8 @@
       (let [group-height (/ 100 (count @round-teams))]
         [:ul.list-reset.mr-2
          {:class "w-1/4"}
+        [:ul.list-reset
+         {:class "w-1/5"}
          (map-indexed
            (fn [group-index teams]
              ^{:key (str group-index round-index teams)}
