@@ -53,7 +53,7 @@
            [:div.absolute.pin-y.pin-l.rounded-sm.rounded-r-none
             {:class [(str "bg-" (name (:color matchup-info)) "-darkest")]
              :style {:width (str win-% "%")
-                     :opacity "0.8"}}]))])))
+                     :opacity "0.85"}}]))])))
 
 (defn- empty-team []
   [:li {:class pending-team-classes}
