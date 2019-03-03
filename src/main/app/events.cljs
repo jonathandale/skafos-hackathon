@@ -23,11 +23,12 @@
  ::initialize-db
  (fn-traced [{:keys [db]} [_]]
    {:db db/default-db
-    :dispatch-n
+
+     :dispatch-later
       (mapv
         (fn [matchup]
-          [::get-matchup matchup])
-        (concat db/east db/west))}))
+          {:ms 250 :dispatch [::get-matchup matchup]})
+        (concat db/east db/west db/midwest db/south))}))
 
 
 (re-frame/reg-event-db
