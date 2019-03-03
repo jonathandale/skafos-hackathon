@@ -2,7 +2,6 @@
   "scripts": {
     "watch": "shadow-cljs watch app",
     "watch-test": "shadow-cljs watch browser-test",
-    "test": "shadow-cljs compile karma-test && karma start --single-run",
     "mock-api": "json-server mock-api.json --watch false --routes routes.json --port 4000 --delay 1000 --static false",
     "api-proxy": "node proxy.js",
     "index-dev": "node scripts/build-index.js",
@@ -17,9 +16,6 @@
     "express": "^4.16.3",
     "http-proxy-middleware": "^0.19.0",
     "json-server": "^0.14.0",
-    "karma": "^2.0.0",
-    "karma-chrome-launcher": "^2.2.0",
-    "karma-cljs-test": "^0.1.0",
     "minimist": "^1.2.0",
     "postcss-cli": "^6.0.0",
     "pug": "^2.0.3",
